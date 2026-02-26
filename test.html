@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Test</title>
+</head>
+
+<body>
+    <h1>Debug Test</h1>
+    <div id="output"></div>
+
+    <script src="js/data.js"></script>
+    <script>
+        const output = document.getElementById('output');
+
+        // Test 1: Data yüklendi mi?
+        if (typeof promptsData !== 'undefined') {
+            output.innerHTML += '<p>✅ Data yüklendi! Toplam: ' + promptsData.length + ' prompt</p>';
+
+            // Test 2: Kategorileri çıkar
+            const categories = new Set();
+            promptsData.forEach(p => {
+                if (p.category) categories.add(p.category);
+            });
+
+            output.innerHTML += '<p>✅ Kategoriler bulundu: ' + categories.size + ' adet</p>';
+            output.innerHTML += '<ul>';
+            categories.forEach(cat => {
+                output.innerHTML += '<li>' + cat + '</li>';
+            });
+            output.innerHTML += '</ul>';
+
+            // Test 3: İlk 3 prompt
+            output.innerHTML += '<h3>İlk 3 Prompt:</h3>';
+            promptsData.slice(0, 3).forEach((p, i) => {
+                output.innerHTML += '<p><strong>' + (i + 1) + '.</strong> [' + p.category + '] ' + p.text.substring(0, 50) + '...</p>';
+            });
+        } else {
+            output.innerHTML += '<p>❌ Data yüklenemedi!</p>';
+        }
+    </script>
+</body>
+
+</html>

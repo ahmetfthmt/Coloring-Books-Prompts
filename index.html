@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coloring Book Prompt Library</title>
+    <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --secondary: #ec4899;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+
+            --bg-body: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+            --radius-lg: 20px;
+            --radius-xl: 24px;
+            --radius-pill: 50px;
+
+            --font-main: 'Outfit', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 100vh;
+            overflow-y: auto;
+        }
+
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+            text-align: center;
+            color: white;
+            animation: fadeIn 0.6s ease-out;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .welcome-screen:hover {
+            transform: scale(1.02);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .welcome-icon {
+            font-size: 6rem;
+            margin-bottom: 2rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .welcome-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            text-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .welcome-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 3rem;
+            opacity: 0.9;
+        }
+
+        .welcome-stats {
+            display: flex;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2.5rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        .welcome-cta {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.9);
+            animation: bounceVertical 2s infinite;
+        }
+
+        .welcome-cta i {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        @keyframes bounceVertical {
+
+            0%,
+            100% {
+                transform: translateY(0);
+                opacity: 0.7;
+            }
+
+            50% {
+                transform: translateY(15px);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* Main App (hidden initially) */
+        .main-app {
+            display: none;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .main-app.active {
+            display: block;
+        }
+
+        /* Controls Section */
+        .lang-toggle {
+            display: flex;
+            gap: 0.5rem;
+            background: #f8fafc;
+            padding: 0.5rem;
+            border-radius: var(--radius-pill);
+        }
+
+        .lang-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-weight: 600;
+            border-radius: var(--radius-pill);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: var(--font-main);
+        }
+
+        .lang-btn:hover {
+            color: var(--primary);
+        }
+
+        .lang-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            box-shadow: 0 4px 8px rgba(124, 58, 237, 0.3);
+        }
+
+        .settings-btn {
+            background: #f8fafc;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        .settings-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        /* Settings Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            max-width: 700px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #f1f5f9;
+            color: var(--text-main);
+        }
+
+        .api-list {
+            margin-bottom: 1.5rem;
+        }
+
+        .api-item {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .api-info {
+            flex: 1;
+        }
+
+        .api-name {
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 0.25rem;
+        }
+
+        .api-key {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .api-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-pill);
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .api-status.active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .api-status.inactive {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .api-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-icon {
+            background: white;
+            border: 1px solid #e2e8f0;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            color: var(--text-muted);
+        }
+
+        .btn-icon:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-pill);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: var(--font-main);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(124, 58, 237, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: var(--radius-lg);
+            font-size: 1rem;
+            font-family: var(--font-main);
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+
+        .add-api-form {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .add-api-form.active {
+            display: block;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            opacity: 0.3;
+            margin-bottom: 1rem;
+        }
+
+        /* Search & Filters */
+        .controls-section {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 2rem;
+        }
+
+        .search-wrapper {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 1.2rem 1.5rem 1.2rem 3.5rem;
+            font-size: 1.1rem;
+            border: 3px solid transparent;
+            border-radius: var(--radius-lg);
+            outline: none;
+            font-family: var(--font-main);
+            background: linear-gradient(white, white) padding-box,
+                linear-gradient(135deg, var(--primary), var(--accent)) border-box;
+            transition: all 0.3s ease;
+        }
+
+        #searchInput:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(124, 58, 237, 0.2);
+        }
+
+        .filter-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 1rem;
+        }
+
+        .category-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .pill {
+            background: #f8fafc;
+            border: 2px solid transparent;
+            color: var(--text-main);
+            padding: 0.6rem 1.2rem;
+            border-radius: var(--radius-pill);
+            cursor: pointer;
+            font-family: var(--font-main);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .pill:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .pill.active {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(124, 58, 237, 0.3);
+        }
+
+        /* Results Info */
+        .results-info {
+            margin-bottom: 1.5rem;
+            padding: 1rem 1.5rem;
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* small fade-in helper for elements that appear on input */
+        .fade-in {
+            animation: fadeIn 0.32s ease both;
+        }
+
+        /* Utility hidden class to hide UI pieces until needed */
+        .hidden { display: none !important; }
+
+        /* Highlighted match style */
+        .match {
+            background: linear-gradient(90deg, rgba(255,229,100,0.95), rgba(255,180,80,0.95));
+            color: #07203b;
+            padding: 0.08rem 0.18rem;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+
+        .results-info i {
+            color: var(--success);
+        }
+
+        /* Grid */
+        .prompts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Card */
+        .prompt-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            cursor: pointer;
+            border: 2px solid transparent;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .prompt-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--primary);
+        }
+
+        .card-category {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.75rem;
+        }
+
+        .card-text {
+            font-size: 1rem;
+            color: var(--text-main);
+            line-height: 1.6;
+            flex-grow: 1;
+            margin-bottom: 1rem;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 2px solid #f1f5f9;
+        }
+
+        .copy-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-pill);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.5);
+            background: linear-gradient(135deg, #764ba2, #667eea);
+        }
+
+        .generate-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            background: linear-gradient(135deg, var(--accent), #f59e0b);
+            color: white;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-pill);
+            cursor: pointer;
+            transition: all 0.3s;
+            opacity: 0.95;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(245, 158, 11, 0.4);
+            opacity: 1;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-pill);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: var(--shadow-xl);
+            transform: translateY(150px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 100;
+            font-weight: 600;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Gemini Panel */
+        .gemini-panel {
+            position: fixed;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 45%;
+            background: white;
+            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+            transform: translateX(100%);
+            transition: transform 0.4s ease;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .gemini-panel.active {
+            transform: translateX(0);
+        }
+
+        .gemini-header {
+            padding: 1.5rem;
+            border-bottom: 2px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #fef3c7, #fde047);
+        }
+
+        .gemini-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #92400e;
+        }
+
+        .close-panel-btn {
+            background: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .close-panel-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .gemini-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .prompt-display {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 1.5rem;
+        }
+
+        .prompt-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .prompt-text {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--text-main);
+        }
+
+        .generation-zone {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+
+        .generate-action-btn {
+            background: linear-gradient(135deg, var(--accent), #f59e0b);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: var(--radius-pill);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .generate-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(245, 158, 11, 0.4);
+        }
+
+
+        @media (max-width: 768px) {
+            .welcome-title {
+                font-size: 2.5rem;
+            }
+
+            .welcome-subtitle {
+                font-size: 1.2rem;
+            }
+
+            .welcome-stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .prompts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+        <div class="app-container">
+            <!-- Welcome Screen -->
+            <div class="welcome-screen" id="welcomeScreen">
+                <div class="welcome-icon">
+                    <i class="fa-solid fa-palette"></i>
+                </div>
+                <h1 class="welcome-title">Coloring Book Prompts</h1>
+                <p class="welcome-subtitle">Large collection for children's coloring books</p>
+
+                <div class="welcome-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">1,965</span>
+                        <span class="stat-label">Prompts</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">13</span>
+                        <span class="stat-label">Categories</span>
+                    </div>
+                </div>
+
+                <p class="welcome-cta">
+                    <i class="fa-solid fa-chevron-down"></i><br>
+                    <strong>Scroll</strong> to start browsing
+                </p>
+            </div>
+
+            <!-- Main App -->
+            <div class="main-app" id="mainApp">
+                <section class="controls-section">
+                    <div class="search-wrapper">
+                        <i class="fa-solid fa-search search-icon"></i>
+                        <input type="text" id="searchInput" placeholder="Example: bear yellow forest (search multiple keywords)"
+                            autofocus>
+                    </div>
+
+                    <div class="filter-wrapper">
+                        <span class="filter-label">Category:</span>
+                        <div id="categoryFilters" class="category-pills">
+                            <!-- Categories will be generated by JavaScript -->
+                        </div>
+                    </div>
+                </section>
+
+                <div class="results-info" id="resultsInfo">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span id="count">0</span> prompts found
+                </div>
+
+                <main id="promptsGrid" class="prompts-grid"></main>
+            </div>
+
+            <div id="toast" class="toast">
+                <i class="fa-solid fa-check-circle"></i> Prompt copied to clipboard!
+            </div>
+
+            <!-- Settings Modal -->
+            <div class="modal-overlay" id="settingsModal">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h2 class="modal-title">⚙️ Gemini API Settings</h2>
+                        <button class="close-btn" id="closeModalBtn">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <!-- API List -->
+                        <div class="api-list" id="apiList">
+                            <!-- API keys will be rendered here -->
+                        </div>
+
+                        <!-- Add New API Button -->
+                        <button class="btn-primary" id="showAddFormBtn" style="width: 100%;">
+                            <i class="fa-solid fa-plus"></i> Add New API Key
+                        </button>
+
+                        <!-- Add API Form -->
+                        <div class="add-api-form" id="addApiForm">
+                            <div class="form-group">
+                                <label class="form-label">API Key Name</label>
+                                <input type="text" class="form-input" id="apiNameInput" placeholder="e.g., Personal Gemini" />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">API Key</label>
+                                <input type="text" class="form-input" id="apiKeyInput" placeholder="AIza..." />
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="btn-primary" id="saveApiBtn">
+                                    <i class="fa-solid fa-check"></i> Save
+                                </button>
+                                <button class="btn-primary" id="cancelAddBtn" style="background: #64748b;">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gemini Panel -->
+            <div class="gemini-panel" id="geminiPanel">
+                <div class="gemini-header">
+                    <h2 class="gemini-title">✨ Generate Coloring Page</h2>
+                    <button class="close-panel-btn" id="closePanelBtn">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="gemini-content">
+                    <!-- Prompt Display -->
+                    <div class="prompt-display">
+                        <div class="prompt-label">Selected Prompt</div>
+                        <div class="prompt-text" id="selectedPrompt">No prompt selected</div>
+                    </div>
+
+                    <!-- Generation Zone -->
+                    <div class="generation-zone" id="generationZone">
+                        <i class="fa-solid fa-sparkles" style="font-size: 3rem; color: var(--accent); margin-bottom: 1rem;"></i>
+                        <h3 style="margin-bottom: 1rem;">Ready to Generate!</h3>
+                        <p style="color: var(--text-muted); margin-bottom: 2rem;">
+                            Click the button below to generate a coloring page with Gemini AI
+                        </p>
+                        <button class="generate-action-btn" id="startGenerateBtn">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            Generate Image
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <script src="js/prompts_data.js?v=20260226"></script>
+    <script src="js/app_new.js?v=20260226"></script>
+    <script src="js/gemini-redirect.js"></script>
+</body>
+
+</html>
